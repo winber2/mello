@@ -22,8 +22,10 @@ const config = {
       'process.env': { NODE_ENV: JSON.stringify(process.env.NODE_ENV) }
     }),
     new HtmlWebpackPlugin({
+      title: 'Mello',
       template: `${APP_DIR}/index.html`,
       filename: `${BUILD_DIR}/index.html`,
+      inject: false
     }),
     new CopyWebpackPlugin([
       { from: STATIC_DIR, BUILD_DIR }

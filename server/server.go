@@ -11,7 +11,7 @@ import (
 )
 
 const staticDirectory string = "/static/"
-const clientDirectory string = "/client/"
+const clientDirectory string = "/client/public/"
 
 func updateWithPatch(patch io.Reader) error {
 	err := update.Apply(patch, update.Options{
@@ -32,6 +32,7 @@ func main() {
 
 	r := mux.NewRouter()
 	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir+staticDirectory))))
+	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir(dir+clientDirectory))))
 	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, dir+clientDirectory+"index.html")
 	})
