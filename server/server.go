@@ -1,27 +1,15 @@
 package main
 
 import (
-	"io"
 	"log"
 	"net/http"
 	"path/filepath"
 
 	"github.com/gorilla/mux"
-	"github.com/inconshreveable/go-update"
 )
 
 const staticDirectory string = "/static/"
 const clientDirectory string = "/client/public/"
-
-func updateWithPatch(patch io.Reader) error {
-	err := update.Apply(patch, update.Options{
-		Patcher: update.NewBSDiffPatcher(),
-	})
-	if err != nil {
-		// error handling
-	}
-	return err
-}
 
 func main() {
 	dir, err := filepath.Abs(filepath.Dir("../"))
@@ -41,9 +29,4 @@ func main() {
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		panic(err)
 	}
-
-	// updateErr := updateWithPatch(io.Reader)
-	// if updateErr != nil {
-	// 	panic(err)
-	// }
 }
