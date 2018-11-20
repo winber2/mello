@@ -82,16 +82,13 @@ const config = {
       'node_modules',
       path.resolve(__dirname, './src')
     ]
-  },
-  optimization: {
-    minimize: true
   }
 };
 
-if (process.env.NODE_ENV === 'production') {
-  // config.plugins.push(
-  //   new webpack.optimization.minimize()
-  // );
+if (process.env.NODE_ENV === 'development') {
+  config.optimization = {
+    minimize: true
+  };
 } else {
   config.devtool = 'source-map';
 }
