@@ -4,6 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
+	"mello/server/app/routes"
+	"mello/server/middleware"
+	"mello/server/mongo"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -17,10 +20,14 @@ const clientDirectory string = "/client/public/"
 // Configuration determines the environment variables of the server
 type Configuration struct {
 	APIKey string `json:"apiKey"`
+	DBHost string `json:"dbHost"`
+	DBPort string `json:"dbPort"`
+	DBName string `json:"dbName"`
 }
 
-func loadConfiguration() {
-	jsonFile, err := os.Open("config.json")
+func loadConfiguration(path string) Configuration {
+	jsonFile, err := os.Open(path)
+	defer jsonFile.Close()
 
 	if err != nil {
 		fmt.Println("No configuration found. Make sure you have a config.json file inside the server folder.")
@@ -31,8 +38,7 @@ func loadConfiguration() {
 	var jsonParser = json.NewDecoder(jsonFile)
 	jsonParser.Decode(&config)
 
-	defer jsonFile.Close()
-	os.Setenv("API_KEY", config.APIKey)
+	return config
 }
 
 func main() {
@@ -42,16 +48,23 @@ func main() {
 		log.Fatal(err)
 	}
 
-	loadConfiguration()
+	config := loadConfiguration("config.json")
+	mongo.NewDBInstance(mongo.MongoConfig(config))
 
-	r := mux.NewRouter()
-	r.PathPrefix("/static/").Handler(http.StripPrefix("/static/", http.FileServer(http.Dir(dir+staticDirectory))))
-	r.PathPrefix("/public/").Handler(http.StripPrefix("/public/", http.FileServer(http.Dir(dir+clientDirectory))))
-	r.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	router := mux.NewRouter().StrictSlash(true)
+	router.Use(middleware.ContentTypeJSONMiddleware)
+
+	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(dir+staticDirectory))))
+	router.PathPrefix("/public").Handler(http.StripPrefix("/public", http.FileServer(http.Dir(dir+clientDirectory))))
+
+	// Add app api routes to mux router
+	routes.AppendAppRoutes(router)
+
+	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, dir+clientDirectory+"index.html")
 	})
 
-	http.Handle("/", r)
+	http.Handle("/", router)
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		fmt.Println("Server crashed and burned")
 		log.Fatal(err)

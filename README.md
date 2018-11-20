@@ -12,6 +12,6 @@ If you want the go server to also host the built version of the frontend, you ca
 
 `npm run build`
 
-This will put the built js bundles in the `client/public/` folder. You can run the go server using:
+This will put the build js bundles in the `client/public/` folder. You can run the go server using:
 
 `go run server.go`
