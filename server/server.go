@@ -17,15 +17,15 @@ import (
 const staticDirectory string = "/static/"
 const clientDirectory string = "/client/public/"
 
-// Configuration determines the environment variables of the server
-type Configuration struct {
+// MelloConfig determines the environment variables of the server
+type MelloConfig struct {
 	APIKey string `json:"apiKey"`
 	DBHost string `json:"dbHost"`
 	DBPort string `json:"dbPort"`
 	DBName string `json:"dbName"`
 }
 
-func loadConfiguration(path string) Configuration {
+func loadConfiguration(path string) MelloConfig {
 	jsonFile, err := os.Open(path)
 	defer jsonFile.Close()
 
@@ -34,7 +34,7 @@ func loadConfiguration(path string) Configuration {
 		log.Fatal(err)
 	}
 
-	var config Configuration
+	var config MelloConfig
 	var jsonParser = json.NewDecoder(jsonFile)
 	jsonParser.Decode(&config)
 
@@ -49,9 +49,11 @@ func main() {
 	}
 
 	config := loadConfiguration("config.json")
-	mongo.NewDBInstance(mongo.MongoConfig(config))
+	mongo.NewDBInstance(mongo.Config(config))
 
 	router := mux.NewRouter().StrictSlash(true)
+
+	// Load middleware into application
 	router.Use(middleware.ContentTypeJSONMiddleware)
 
 	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(dir+staticDirectory))))
@@ -60,11 +62,13 @@ func main() {
 	// Add app api routes to mux router
 	routes.AppendAppRoutes(router)
 
+	// Catch all endpoint should redirect everything to the React Application
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, dir+clientDirectory+"index.html")
 	})
 
 	http.Handle("/", router)
+
 	if err := http.ListenAndServe(":8000", nil); err != nil {
 		fmt.Println("Server crashed and burned")
 		log.Fatal(err)

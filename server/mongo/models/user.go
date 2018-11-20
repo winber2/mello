@@ -19,7 +19,7 @@ func (user *User) Save() error {
 	session := mongo.Database.Session.Copy()
 	defer session.Close()
 
-	c := mongo.Database.C("user").With(session)
+	c := mongo.Database.C("users").With(session)
 
 	err := c.Insert(bson.M{
 		"name":     user.Name,

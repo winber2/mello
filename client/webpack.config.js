@@ -9,6 +9,7 @@ const APP_DIR = path.resolve(__dirname, './src');
 const STATIC_DIR = path.resolve(__dirname, '../static');
 
 const config = {
+  mode: 'development',
   entry: {
     index: `${APP_DIR}/index.jsx`
   },
@@ -25,7 +26,6 @@ const config = {
       title: 'Mello',
       template: `${APP_DIR}/index.html`,
       filename: `${BUILD_DIR}/index.html`,
-      inject: false
     }),
     new CopyWebpackPlugin([
       { from: STATIC_DIR, BUILD_DIR }
@@ -39,7 +39,21 @@ const config = {
         test: /\.(js|jsx)$/,
         loader: 'babel-loader',
         query: {
-          presets: [ 'es2015', 'react', 'stage-2' ]
+          presets: [ "@babel/preset-env", "@babel/preset-react" ],
+          plugins: [
+            // Stage 2
+            ["@babel/plugin-proposal-decorators", { "legacy": true }],
+            "@babel/plugin-proposal-function-sent",
+            "@babel/plugin-proposal-export-namespace-from",
+            "@babel/plugin-proposal-numeric-separator",
+            "@babel/plugin-proposal-throw-expressions",
+
+            // Stage 3
+            "@babel/plugin-syntax-dynamic-import",
+            "@babel/plugin-syntax-import-meta",
+            ["@babel/plugin-proposal-class-properties", { "loose": false }],
+            "@babel/plugin-proposal-json-strings"
+          ]
         }
       },
       {
@@ -54,7 +68,13 @@ const config = {
   },
   devServer: {
     contentBase: path.join(__dirname, "./public"),
-    port: '3000'
+    port: '3000',
+    proxy: {
+      "/": {
+        target: 'http://localhost:8000',
+        secure: true
+      }
+    }
   },
   resolve: {
     extensions: [ '.js', '.jsx' ],
@@ -62,13 +82,16 @@ const config = {
       'node_modules',
       path.resolve(__dirname, './src')
     ]
+  },
+  optimization: {
+    minimize: true
   }
 };
 
 if (process.env.NODE_ENV === 'production') {
-  config.plugins.push(
-    new webpack.optimize.UglifyJsPlugin()
-  );
+  // config.plugins.push(
+  //   new webpack.optimization.minimize()
+  // );
 } else {
   config.devtool = 'source-map';
 }

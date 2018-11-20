@@ -8,19 +8,19 @@ import (
 	"github.com/globalsign/mgo"
 )
 
-// Database is the singleton instance of the mgo session
+// Database is the mgo Database instance
 var Database *mgo.Database
 
-// MongoConfig is configuration that mgo takes to connect to MongoDB
-type MongoConfig struct {
+// Config is configuration that mgo takes to connect to MongoDB
+type Config struct {
 	APIKey string
 	DBHost string
 	DBPort string
 	DBName string
 }
 
-// Initializes the Mongo session constant
-func NewDBInstance(config MongoConfig) *mgo.Database {
+// NewDBInstance initializes the Mongo session constant
+func NewDBInstance(config Config) *mgo.Database {
 	if Database != nil {
 		return Database
 	}
