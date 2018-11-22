@@ -12,15 +12,30 @@ import (
 )
 
 func AppendUserRoutes(r *mux.Router) {
-	r.HandleFunc("/user", GetUsers).Methods("GET")
-	r.HandleFunc("/user", PostUser).Methods("POST")
+	r.HandleFunc("/user/", GetUsers).Methods("GET")
+	r.HandleFunc("/user/", PostUser).Methods("POST")
+	r.HandleFunc("/user/{id}/", GetUser).Methods("GET")
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	var result []bson.M
 	query := mongo.Database.C("users").Find(bson.M{})
 	query.All(&result)
-	fmt.Println(result)
+	json.NewEncoder(w).Encode(result)
+}
+
+func GetUser(w http.ResponseWriter, r *http.Request) {
+	var result models.User
+	vars := mux.Vars(r)
+	fmt.Println(vars["id"])
+	objectId := bson.ObjectIdHex(vars["id"])
+	err := mongo.Database.C("users").Find(bson.M{"_id": objectId}).One(&result)
+
+	if err != nil {
+		fmt.Println(err)
+		w.WriteHeader(http.StatusNotFound)
+	}
+
 	json.NewEncoder(w).Encode(result)
 }
 
