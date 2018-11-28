@@ -60,7 +60,7 @@ func createAuthRouter() http.Handler {
 	ab.Config.Storage.SessionState = sessionStore
 	ab.Config.Storage.CookieState = cookieStore
 
-	ab.Config.Paths.Mount = "/"
+	ab.Config.Paths.Mount = "/auth"
 	ab.Config.Paths.RootURL = "http://localhost:8000/"
 
 	// This is using the renderer from: github.com/volatiletech/authboss
@@ -81,6 +81,7 @@ func createAuthRouter() http.Handler {
 	// router.PathPrefix("/auth").Handler(ab.Config.Core.Router)
 
 	return ab.Config.Core.Router
+
 }
 
 func main() {
@@ -94,13 +95,13 @@ func main() {
 	mongo.NewDBInstance(mongo.Config(config))
 
 	// Create Mello and AuthBoss routers
-	router := mux.NewRouter().StrictSlash(true)
-	// abRouter := configureAuthRouter(mux.NewRouter().StrictSlash(true))
+	router := mux.NewRouter()
 	abRouter := createAuthRouter()
 
 	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(dir+staticDirectory))))
 	router.PathPrefix("/public").Handler(http.StripPrefix("/public", http.FileServer(http.Dir(dir+clientDirectory))))
 	router.PathPrefix("/auth").Handler(http.StripPrefix("/auth", abRouter))
+
 	// Add app api routes to mux router
 	routes.AppendAppRoutes(router)
 

@@ -22,6 +22,15 @@ class App extends React.Component {
       .then(res => console.log(res))
   }
 
+  createUser = () => {
+    const params = {
+      name: 'test user',
+      email: 'fuck@sss.com',
+      password: 'badpassword',
+    }
+    axios.post('/auth/register', {}, params);
+  }
+
   render() {
     return(
       <div style={{ display: 'flex' }}>
@@ -43,6 +52,9 @@ class App extends React.Component {
 
         <button onClick={this.getUser}>
           GET
+        </button>
+        <button onClick={this.createUser}>
+          CREATE
         </button>
       </div>
     );
