@@ -68,7 +68,7 @@ const config = {
   },
   devServer: {
     contentBase: path.join(__dirname, "./public"),
-    port: '3000',
+    port: '9222',
     proxy: {
       "/": {
         target: 'http://localhost:8000',

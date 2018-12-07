@@ -7,7 +7,7 @@ class App extends React.Component {
     name: '',
     email: '',
     password: '',
-    id: ''
+    // id: ''
   }
 
   onChange = type => e => this.setState({ [type]: e.target.value })
@@ -44,7 +44,7 @@ class App extends React.Component {
         <button onClick={this.submit}>
           SUBMIT
         </button>
-
+{/* 
 
         <input value={this.state.id} onChange={this.onChange('id')}>
 
@@ -55,7 +55,7 @@ class App extends React.Component {
         </button>
         <button onClick={this.createUser}>
           CREATE
-        </button>
+        </button> */}
       </div>
     );
   }

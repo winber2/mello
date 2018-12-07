@@ -40,7 +40,9 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func PostUser(w http.ResponseWriter, r *http.Request) {
-	var req models.User
-	json.NewDecoder(r.Body).Decode(&req)
-	req.Save()
+	var user models.User
+	json.NewDecoder(r.Body).Decode(&user)
+
+	fmt.Println(user)
+	user.Save()
 }
