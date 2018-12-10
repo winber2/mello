@@ -2,10 +2,12 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"log"
 	"mello/server/app/routes"
 	"mello/server/mongo"
+	"mello/server/mongo/models"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -19,7 +21,12 @@ const (
 )
 
 var (
-	config MelloConfig
+	config  MelloConfig
+	resetDB bool
+
+	collections = []mongo.Collection{
+		models.UserCollection,
+	}
 )
 
 // MelloConfig determines the environment variables of the server
@@ -28,6 +35,16 @@ type MelloConfig struct {
 	DBHost string `json:"dbHost"`
 	DBPort string `json:"dbPort"`
 	DBName string `json:"dbName"`
+}
+
+func setupCollections() {
+	for _, collection := range collections {
+		err := collection.Create()
+
+		if err != nil {
+			log.Fatal(err)
+		}
+	}
 }
 
 func loadConfiguration(path string) {
@@ -43,7 +60,14 @@ func loadConfiguration(path string) {
 	jsonParser.Decode(&config)
 }
 
+func parseFlags() {
+	flag.BoolVar(&resetDB, "R", false, "Resets the database and re-creates collections with defined schema")
+	flag.Parse()
+}
+
 func main() {
+	parseFlags()
+
 	dir, err := filepath.Abs(filepath.Dir("../"))
 
 	if err != nil {
@@ -52,6 +76,12 @@ func main() {
 
 	loadConfiguration("config.json")
 	mongo.NewDBInstance(mongo.Config(config))
+
+	// Reset the database with updated schema, we will probably need a better method later on
+	if resetDB {
+		mongo.Database.DropDatabase()
+		setupCollections()
+	}
 
 	router := mux.NewRouter()
 	// router.Use(ContentTypeJSONMiddlewar)

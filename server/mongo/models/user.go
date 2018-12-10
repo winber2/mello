@@ -4,6 +4,7 @@ import (
 	"mello/server/mongo"
 	"time"
 
+	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -32,6 +33,34 @@ type User struct {
 	Username string        `json:"username" bson:"username"`
 	Email    string        `json:"email" bson:"email"`
 	Password string        `json:"password" bson:"password"`
+}
+
+var info = &mgo.CollectionInfo{
+	Validator: bson.M{
+		"$jsonSchema": bson.M{
+			"bsonType": "object",
+			"required": []string{"name", "email", "password"},
+			"properties": bson.M{
+				"name": bson.M{
+					"bsonType":    "string",
+					"description": "must be a string and is required",
+				},
+				"email": bson.M{
+					"bsonType":    "string",
+					"description": "must be a string and is required",
+				},
+				"password": bson.M{
+					"bsonType":    "string",
+					"description": "must be a string and is required",
+				},
+			},
+		},
+	},
+}
+
+var UserCollection = mongo.Collection{
+	Name:           "users",
+	CollectionInfo: info,
 }
 
 func (user *User) Save() error {
