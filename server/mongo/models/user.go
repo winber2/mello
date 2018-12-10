@@ -1,6 +1,7 @@
 package models
 
 import (
+	"fmt"
 	"mello/server/mongo"
 	"time"
 
@@ -8,24 +9,6 @@ import (
 	"github.com/globalsign/mgo/bson"
 	"golang.org/x/crypto/bcrypt"
 )
-
-/*
-	AuthBoss ServerStorer and User interface from the docs that must be implemented
-	type ServerStorer interface {
-	    // Load will look up the user based on the passed the PrimaryID
-	    Load(ctx context.Context, key string) (User, error)
-
-	    // Save persists the user in the database, this should never
-	    // create a user and instead return ErrUserNotFound if the user
-	    // does not exist.
-	    Save(ctx context.Context, user User) error
-	}
-
-	type User interface {
-    GetPID() (pid string)
-    PutPID(pid string)
-	}
-*/
 
 // User table contains the information for each user
 type User struct {
@@ -42,50 +25,69 @@ var info = &mgo.CollectionInfo{
 			"required": []string{"name", "email", "password"},
 			"properties": bson.M{
 				"name": bson.M{
-					"bsonType":    "string",
-					"description": "must be a string and is required",
+					"bsonType":  "string",
+					"minLength": 6,
+					"maxLength": 20,
 				},
 				"email": bson.M{
-					"bsonType":    "string",
-					"description": "must be a string and is required",
+					"bsonType":  "string",
+					"minLength": 1,
+					"maxLength": 256,
+					"pattern":   "^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\\.[a-zA-Z0-9-.]+$",
 				},
 				"password": bson.M{
-					"bsonType":    "string",
-					"description": "must be a string and is required",
+					"bsonType":  "string",
+					"minLength": 6,
 				},
 			},
 		},
 	},
 }
 
+var index = mgo.Index{
+	Name:     "UserIndex",
+	Key:      []string{"username", "email"},
+	Unique:   true,
+	DropDups: true,
+	Sparse:   true,
+}
+
+// UserCollection defines the settings of the MongoDB Collection that Users will be saved to
 var UserCollection = mongo.Collection{
 	Name:           "users",
 	CollectionInfo: info,
+	Indexes:        []mgo.Index{index},
 }
 
-func (user *User) Save() error {
+// Save will try to save a User to the database if it is valid
+func (u *User) Save() error {
 	now := time.Now()
 	session := mongo.Database.Session.Copy()
 	defer session.Close()
 
 	c := mongo.Database.C("users").With(session)
-	result, _ := FindUserByName(user.Username)
+	result, _ := FindUserByName(u.Username)
 
 	if result != nil {
-		return mongo.Error("Username already exists")
+		fmt.Println("asdf")
+		return mongo.CreateFormError("User", []string{"username"})
 	}
 
-	password, _ := getPasswordHash(user.Password)
+	password, _ := getPasswordHash(u.Password)
 
 	err := c.Insert(bson.M{
-		"name":     user.Username,
-		"email":    user.Email,
+		"name":     u.Username,
+		"email":    u.Email,
 		"password": password,
 		"created":  now,
 		"updated":  now,
 	})
 
 	return err
+}
+
+func (u *User) Valid() error {
+	return nil
 }
 
 // FindUserByName is a function to help find users in the database
@@ -96,72 +98,8 @@ func FindUserByName(name string) (*User, error) {
 	return result, err
 }
 
+// getPasswordHash hashes and salts a given password using bcrypt
 func getPasswordHash(pw string) (string, error) {
 	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
 	return string(hash), err
 }
-
-// func (user *User) GetPID() string {
-// 	return user.Name
-// }
-//
-// func (user *User) PutPID(pid string) {
-// 	mongo.Database.C("users").Update(
-// 		bson.M{"_id": user.ID},
-// 		bson.M{"$set": bson.M{"name": pid}},
-// 	)
-// }
-
-// type UserStorer struct {
-// 	// Users  map[string]User
-// 	// Tokens map[string][]string
-// }
-//
-// func (s *UserStorer) Load(ctx context.Context, key string) (authboss.User, error) {
-// 	var result authboss.User
-// 	objectID := bson.ObjectId(key)
-// 	err := mongo.Database.C("users").Find(bson.M{"_id": objectID}).One(&result)
-//
-// 	return result, err
-// }
-//
-// func (s *UserStorer) Save(ctx context.Context, u authboss.User) error {
-// 	var result User
-// 	user := u.(*User)
-//
-// 	c := mongo.Database.C("users")
-// 	err := c.Find(bson.M{"_id": user.ID}).One(&result)
-//
-// 	if err != nil {
-// 		return authboss.ErrUserNotFound
-// 	}
-//
-// 	c.Update(
-// 		bson.M{"_id": user.ID},
-// 		result,
-// 	)
-//
-// 	return nil
-// }
-//
-// func (s *UserStorer) New(ctx context.Context) authboss.User {
-// 	return &User{}
-// }
-//
-// // Create the user
-// func (s *UserStorer) Create(ctx context.Context, u authboss.User) error {
-// 	var result *User
-// 	user := u.(*User)
-//
-// 	c := mongo.Database.C("users")
-// 	err := c.FindId(user.ID).One(&result)
-//
-// 	if err == nil {
-// 		return authboss.ErrUserFound
-// 	}
-//
-// 	// debugln("Created new user:", u.Name)
-// 	c.Insert(*user)
-//
-// 	return nil
-// }

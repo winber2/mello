@@ -4,7 +4,7 @@ import axios from 'axios'
 class App extends React.Component {
 
   state = {
-    name: '',
+    username: '',
     email: '',
     password: '',
     // id: ''
@@ -24,7 +24,7 @@ class App extends React.Component {
 
   createUser = () => {
     const params = {
-      name: 'test user',
+      username: 'test user',
       email: 'fuck@sss.com',
       password: 'badpassword',
     }
@@ -34,8 +34,8 @@ class App extends React.Component {
   render() {
     return(
       <div style={{ display: 'flex' }}>
-        name
-        <input value={this.state.name} onChange={this.onChange('name')} />
+        username
+        <input value={this.state.username} onChange={this.onChange('username')} />
         email
         <input value={this.state.email} onChange={this.onChange('email')} />
         password
@@ -44,7 +44,7 @@ class App extends React.Component {
         <button onClick={this.submit}>
           SUBMIT
         </button>
-{/* 
+{/*
 
         <input value={this.state.id} onChange={this.onChange('id')}>
 

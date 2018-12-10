@@ -44,5 +44,7 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 	json.NewDecoder(r.Body).Decode(&user)
 
 	fmt.Println(user)
-	user.Save()
+	err := user.Save()
+
+	fmt.Println(err)
 }

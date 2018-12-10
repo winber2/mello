@@ -75,11 +75,11 @@ func main() {
 	}
 
 	loadConfiguration("config.json")
-	mongo.NewDBInstance(mongo.Config(config))
+	database := mongo.NewDBInstance(mongo.Config(config))
 
 	// Reset the database with updated schema, we will probably need a better method later on
 	if resetDB {
-		mongo.Database.DropDatabase()
+		database.DropDatabase()
 		setupCollections()
 	}
 
