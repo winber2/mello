@@ -1,3 +1,7 @@
+### Disclaimer
+
+i am new to go, i suck at go, also dominos pizza is delicious
+
 ### Getting Started
 
 Make sure you have node installed, then go into the client folder and run:

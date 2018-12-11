@@ -11,10 +11,12 @@ import (
 	"github.com/gorilla/mux"
 )
 
-func AppendUserRoutes(r *mux.Router) {
-	r.HandleFunc("/user/", GetUsers).Methods("GET")
-	r.HandleFunc("/user/", PostUser).Methods("POST")
-	r.HandleFunc("/user/{id}/", GetUser).Methods("GET")
+func UserRoutes() *mux.Router {
+	r := mux.NewRouter()
+	r.HandleFunc("/", GetUsers).Methods("GET")
+	r.HandleFunc("/", PostUser).Methods("POST")
+	r.HandleFunc("/{id}/", GetUser).Methods("GET")
+	return r
 }
 
 func GetUsers(w http.ResponseWriter, r *http.Request) {

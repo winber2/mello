@@ -5,7 +5,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"mello/server/app/routes"
+	"mello/server/api"
 	"mello/server/mongo"
 	"mello/server/mongo/models"
 	"net/http"
@@ -89,8 +89,8 @@ func main() {
 	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(dir+staticDirectory))))
 	router.PathPrefix("/public").Handler(http.StripPrefix("/public", http.FileServer(http.Dir(dir+clientDirectory))))
 
-	// Add app api routes to mux router
-	routes.AppendAppRoutes(router)
+	// Append api routes to server
+	router.PathPrefix("/api").Handler(http.StripPrefix("/api", api.Router()))
 
 	// Catch all endpoint should redirect everything to the React Application
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
