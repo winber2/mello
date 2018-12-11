@@ -64,6 +64,32 @@ var UserCollection = mongo.Collection{
 	Indexes:        []mgo.Index{index},
 }
 
+// getKeyErrors is a helper that gets the key/form errors in user validation
+func getKeyErrors(u *User, results []User) error {
+	var keys = make(map[string]bool)
+	for _, user := range results {
+		if u.Email == user.Email {
+			keys["email"] = true
+		}
+		if u.Username == user.Username {
+			keys["username"] = true
+		}
+	}
+
+	var keyErrors = funk.Keys(keys).([]string)
+	if len(keyErrors) > 0 {
+		return mongo.CreateFormError("User", keyErrors)
+	}
+
+	return nil
+}
+
+// getPasswordHash hashes and salts a given password using bcrypt
+func getPasswordHash(pw string) (string, error) {
+	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
+	return string(hash), err
+}
+
 // Save will try to save a User to the database if it is valid
 func (u *User) Save() error {
 	now := time.Now()
@@ -90,30 +116,17 @@ func (u *User) Save() error {
 
 func (u *User) Valid() error {
 	var results []User
-	err := mongo.Database.C(userCollection).Find(bson.M{
+	if err := mongo.Database.C(userCollection).Find(bson.M{
 		"$or": []bson.M{
 			bson.M{"username": u.Username},
 			bson.M{"email": u.Email},
 		},
-	}).All(&results)
-
-	if err != nil {
+	}).All(&results); err != nil {
 		return err
 	}
-
-	var keys = make(map[string]bool)
-	for _, user := range results {
-		if u.Email == user.Email {
-			keys["email"] = true
-		}
-		if u.Username == user.Username {
-			keys["username"] = true
-		}
-	}
-
-	var keyErrors = funk.Keys(keys).([]string)
-	if len(keyErrors) > 0 {
-		return mongo.CreateFormError("User", keyErrors)
+	fmt.Println(results)
+	if err := getKeyErrors(u, results); err != nil {
+		return err
 	}
 
 	return nil
@@ -125,10 +138,4 @@ func FindUserByName(name string) (*User, error) {
 	err := mongo.Database.C(userCollection).Find(name).One(&result)
 
 	return result, err
-}
-
-// getPasswordHash hashes and salts a given password using bcrypt
-func getPasswordHash(pw string) (string, error) {
-	hash, err := bcrypt.GenerateFromPassword([]byte(pw), bcrypt.DefaultCost)
-	return string(hash), err
 }
