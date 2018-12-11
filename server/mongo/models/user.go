@@ -7,7 +7,12 @@ import (
 
 	"github.com/globalsign/mgo"
 	"github.com/globalsign/mgo/bson"
+	"github.com/thoas/go-funk"
 	"golang.org/x/crypto/bcrypt"
+)
+
+const (
+	userCollection = "users"
 )
 
 // User table contains the information for each user
@@ -22,9 +27,9 @@ var info = &mgo.CollectionInfo{
 	Validator: bson.M{
 		"$jsonSchema": bson.M{
 			"bsonType": "object",
-			"required": []string{"name", "email", "password"},
+			"required": []string{"username", "email", "password"},
 			"properties": bson.M{
-				"name": bson.M{
+				"username": bson.M{
 					"bsonType":  "string",
 					"minLength": 6,
 					"maxLength": 20,
@@ -54,7 +59,7 @@ var index = mgo.Index{
 
 // UserCollection defines the settings of the MongoDB Collection that Users will be saved to
 var UserCollection = mongo.Collection{
-	Name:           "users",
+	Name:           userCollection,
 	CollectionInfo: info,
 	Indexes:        []mgo.Index{index},
 }
@@ -63,20 +68,17 @@ var UserCollection = mongo.Collection{
 func (u *User) Save() error {
 	now := time.Now()
 	session := mongo.Database.Session.Copy()
+	c := mongo.Database.C(userCollection).With(session)
 	defer session.Close()
 
-	c := mongo.Database.C("users").With(session)
-	result, _ := FindUserByName(u.Username)
-
-	if result != nil {
-		fmt.Println("asdf")
-		return mongo.CreateFormError("User", []string{"username"})
+	if err := u.Valid(); err != nil {
+		fmt.Println(err)
+		return err
 	}
 
 	password, _ := getPasswordHash(u.Password)
-
 	err := c.Insert(bson.M{
-		"name":     u.Username,
+		"username": u.Username,
 		"email":    u.Email,
 		"password": password,
 		"created":  now,
@@ -87,13 +89,40 @@ func (u *User) Save() error {
 }
 
 func (u *User) Valid() error {
+	var results []User
+	err := mongo.Database.C(userCollection).Find(bson.M{
+		"$or": []bson.M{
+			bson.M{"username": u.Username},
+			bson.M{"email": u.Email},
+		},
+	}).All(&results)
+
+	if err != nil {
+		return err
+	}
+
+	var keys = make(map[string]bool)
+	for _, user := range results {
+		if u.Email == user.Email {
+			keys["email"] = true
+		}
+		if u.Username == user.Username {
+			keys["username"] = true
+		}
+	}
+
+	var keyErrors = funk.Keys(keys).([]string)
+	if len(keyErrors) > 0 {
+		return mongo.CreateFormError("User", keyErrors)
+	}
+
 	return nil
 }
 
 // FindUserByName is a function to help find users in the database
 func FindUserByName(name string) (*User, error) {
 	var result *User
-	err := mongo.Database.C("users").Find(name).One(&result)
+	err := mongo.Database.C(userCollection).Find(name).One(&result)
 
 	return result, err
 }

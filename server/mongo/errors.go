@@ -11,32 +11,42 @@ const (
 	formError  = "FormError"
 )
 
-// Error is a standardized error struct to return when a bad request is made
-type Error struct {
+func toJSON(j interface{}) (string, error) {
+	b, err := json.Marshal(j)
+	return string(b), err
+}
+
+// MelloError is a standardized error for any server side issues
+type MelloError struct {
 	Type       string
 	Message    string
 	Resolution string
 }
 
+// CreateError returns a Error for any server side issues
+func CreateError(message string) error {
+	return &MelloError{Type: melloError, Message: message}
+}
+
+// Error converts the the error into a string -- implementing the error interface
+func (m *MelloError) Error() string {
+	return m.Message
+}
+
+// ToJSON is a convenience function to convert the Error into a JSON for API Responses
+func (m *MelloError) ToJSON() (string, error) {
+	return toJSON(m)
+}
+
+// FormError is a standardized error for bad form requests
 type FormError struct {
 	Type     string
 	Message  string
 	Failures []string
 }
 
-// CreateError returns a Error which implements error
-func CreateError(message string) error {
-	return &Error{Type: melloError, Message: message}
-}
-
-func (m *Error) Error() string {
-	return m.Message
-}
-
-// ToJSON is a convenience function to convert the Error into a JSON for API Responses
-func (m *Error) ToJSON() (string, error) {
-	b, err := json.Marshal(m)
-	return string(b), err
+func getMessage(model string, key string) string {
+	return fmt.Sprintf("%v with that %v already exists", model, key)
 }
 
 // CreateFormError creates a FormError used for bad form requests
@@ -56,10 +66,12 @@ func CreateFormError(model string, keys []string) error {
 	}
 }
 
+// Error converts the the error into a string -- implementing the error interface
 func (f *FormError) Error() string {
 	return f.Message
 }
 
-func getMessage(model string, key string) string {
-	return fmt.Sprintf("%v with that %v already exists", model, key)
+// ToJSON is a convenience function to convert the Error into a JSON for API Responses
+func (f *FormError) ToJSON() (string, error) {
+	return toJSON(f)
 }

@@ -6,6 +6,7 @@ require (
 	github.com/gorilla/securecookie v1.1.1
 	github.com/gorilla/sessions v1.1.3
 	github.com/pkg/errors v0.8.0
+	github.com/thoas/go-funk v0.0.0-20181020164546-fbae87fb5b5c
 	github.com/volatiletech/authboss v2.1.0+incompatible
 	github.com/volatiletech/authboss-clientstate v0.0.0-20180816162810-64ed659bd56a
 	github.com/volatiletech/authboss-renderer v0.0.0-20181105062701-4b64de40529a

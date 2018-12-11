@@ -1,3 +1,4 @@
 /client/node_modules
 /client/public
 /server/config.json
+/server/server

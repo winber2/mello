@@ -1,8 +1,6 @@
 package mongo
 
 import (
-	"fmt"
-
 	"github.com/globalsign/mgo"
 )
 
@@ -26,9 +24,9 @@ func (c *Collection) Create() error {
 	}
 
 	for _, index := range c.Indexes {
-		fmt.Println("asdf")
-		a := collection.EnsureIndex(index)
-		fmt.Println(a)
+		if err := collection.EnsureIndex(index); err != nil {
+			return err
+		}
 	}
 
 	return nil

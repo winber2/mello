@@ -84,7 +84,7 @@ func main() {
 	}
 
 	router := mux.NewRouter()
-	// router.Use(ContentTypeJSONMiddlewar)
+	router.Use(ContentTypeJSONMiddleware)
 
 	router.PathPrefix("/static").Handler(http.StripPrefix("/static", http.FileServer(http.Dir(dir+staticDirectory))))
 	router.PathPrefix("/public").Handler(http.StripPrefix("/public", http.FileServer(http.Dir(dir+clientDirectory))))
