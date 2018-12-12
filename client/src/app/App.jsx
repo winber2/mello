@@ -1,64 +1,54 @@
 import React from 'react';
-import axios from 'axios'
+import injectSheet from 'react-jss';
+import { Switch, Route } from 'react-router';
+import { OFF_WHITE, PRIMARY_GREY } from 'common/constants/colors';
+
+import PrivateRoute from 'auth/PrivateRoute';
+import AppHeader from './header/AppHeader';
+import Home from 'home/Home';
+
+const styles = {
+  main: {
+    height: '100vh',
+    width: '100vw',
+    display: 'flex',
+    flexDirection: 'column',
+    alignItems: 'center',
+    backgroundColor: OFF_WHITE,
+  },
+  body: {
+    flexGrow: 1,
+    width: 1300,
+    backgroundColor: PRIMARY_GREY,
+  },
+};
 
 class App extends React.Component {
-
-  state = {
-    username: '',
-    email: '',
-    password: '',
-    // id: ''
-  }
-
-  onChange = type => e => this.setState({ [type]: e.target.value })
-
-  submit = (e) => {
-    e.preventDefault();
-    axios.post('/api/user/', this.state)
-  }
-
-  getUser = e => {
-    axios.get(`/api/user/${this.state.id}/`)
-      .then(res => console.log(res))
-  }
-
-  createUser = () => {
-    const params = {
-      username: 'test user',
-      email: 'fuck@sss.com',
-      password: 'badpassword',
-    }
-    axios.post('/auth/register', {}, params);
-  }
-
   render() {
-    return(
-      <div style={{ display: 'flex' }}>
-        username
-        <input value={this.state.username} onChange={this.onChange('username')} />
-        email
-        <input value={this.state.email} onChange={this.onChange('email')} />
-        password
-        <input value={this.state.password} onChange={this.onChange('password')} />
-
-        <button onClick={this.submit}>
-          SUBMIT
-        </button>
-{/*
-
-        <input value={this.state.id} onChange={this.onChange('id')}>
-
-        </input>
-
-        <button onClick={this.getUser}>
-          GET
-        </button>
-        <button onClick={this.createUser}>
-          CREATE
-        </button> */}
+    const { classes } = this.props;
+    return (
+      <div className={classes.main}>
+        <AppHeader />
+        <div className={classes.body}>
+          <Switch>
+            <PrivateRoute
+              path={'/users'}
+              component={Home}
+              isAuthenticated
+            />
+            <Route
+              path={'/'}
+              component={Home}
+            />
+            {/* <Redirect
+              path={'/auth'}
+              component={Authentication}
+            /> */}
+          </Switch>
+        </div>
       </div>
     );
   }
 }
 
-export default App;
+export default injectSheet(styles)(App);

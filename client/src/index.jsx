@@ -14,9 +14,7 @@ import store from 'redux/store';
 jss.setup(preset());
 
 // custom colors for jss
-const theme = {
-
-};
+const theme = {};
 
 ReactDOM.render(
   <Provider store={store}>
@@ -25,5 +23,6 @@ ReactDOM.render(
         <Route path="/" component={App} />
       </Router>
     </ThemeProvider>
-  </Provider>, document.getElementById('root')
+  </Provider>,
+  document.getElementById('root')
 );

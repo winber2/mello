@@ -27,8 +27,6 @@
   },
   "devDependencies": {
     "@babel/core": "^7.1.6",
-    "@babel/preset-env": "^7.1.6",
-    "@babel/preset-react": "^7.0.0",
     "@babel/plugin-proposal-class-properties": "^7.0.0",
     "@babel/plugin-proposal-decorators": "^7.0.0",
     "@babel/plugin-proposal-export-namespace-from": "^7.0.0",
@@ -38,6 +36,8 @@
     "@babel/plugin-proposal-throw-expressions": "^7.0.0",
     "@babel/plugin-syntax-dynamic-import": "^7.0.0",
     "@babel/plugin-syntax-import-meta": "^7.0.0",
+    "@babel/preset-env": "^7.1.6",
+    "@babel/preset-react": "^7.0.0",
     "babel-eslint": "^10.0.1",
     "babel-loader": "^8.0.4",
     "clean-webpack-plugin": "^1.0.0",
@@ -56,12 +56,13 @@
     "extract-text-webpack-plugin": "^3.0.2",
     "file-loader": "^2.0.0",
     "html-webpack-plugin": "^3.2.0",
+    "prettier": "^1.15.3",
     "url-loader": "^1.1.2",
     "webpack": "^4.25.1",
     "webpack-dev-server": "^3.1.10"
   },
   "scripts": {
-    "start": "NODE_ENV=development webpack-dev-server --progress --hot",
+    "start": "NODE_ENV=development webpack-dev-server --progress --hot --no-inline",
     "build": "NODE_ENV=production webpack"
   },
   "author": "",
