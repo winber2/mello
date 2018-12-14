@@ -8,10 +8,13 @@ import MelloLogo from './MelloLogo';
 const styles = {
   main: {
     height: 60,
-    width: '100%',
+    minHeight: 60,
+    width: '100vw',
     display: 'flex',
     justifyContent: 'center',
     background: PRIMARY_BLUE,
+    position: 'fixed',
+    top: 0,
   },
   content: {
     height: '100%',

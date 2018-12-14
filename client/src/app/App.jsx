@@ -3,13 +3,14 @@ import injectSheet from 'react-jss';
 import { Switch, Route } from 'react-router';
 import { OFF_WHITE, PRIMARY_GREY } from 'common/constants/colors';
 
+import Home from 'home/Home';
 import PrivateRoute from 'auth/PrivateRoute';
 import AppHeader from './header/AppHeader';
-import Home from 'home/Home';
 
 const styles = {
   main: {
-    height: '100vh',
+    height: 'min-content',
+    minHeight: '100vh',
     width: '100vw',
     display: 'flex',
     flexDirection: 'column',
@@ -17,9 +18,9 @@ const styles = {
     backgroundColor: OFF_WHITE,
   },
   body: {
-    flexGrow: 1,
+    marginTop: 60,
+    height: 'calc(100% - 60px)',
     width: 1300,
-    backgroundColor: PRIMARY_GREY,
   },
 };
 
