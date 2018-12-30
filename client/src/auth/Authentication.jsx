@@ -24,6 +24,10 @@ const styles = {
   },
 };
 
+function getDisabledStatus({ email, username, password }) {
+  return !(email && username && password);
+}
+
 class Authentication extends React.Component {
   onSubmit = (values, actions) => {
     console.log(values, actions);
@@ -68,7 +72,9 @@ class Authentication extends React.Component {
                 value={props.values.password}
                 label={props.errors.password || 'Password'}
               />
-              <Button type="submit">Submit</Button>
+              <Button type="submit" disabled={getDisabledStatus(props.values)}>
+                Submit
+              </Button>
             </Form>
           )}
         </Formik>

@@ -1,7 +1,8 @@
 import React from 'react';
 import injectSheet from 'react-jss';
+import { Link } from 'react-router-dom';
 
-import { PRIMARY_BLUE } from 'common/constants/colors';
+import { PRIMARY_BLUE, OFF_WHITE } from 'common/constants/colors';
 
 import MelloLogo from './MelloLogo';
 
@@ -29,6 +30,9 @@ const styles = {
     display: 'flex',
     alignItems: 'center',
   },
+  link: {
+    color: OFF_WHITE,
+  },
 };
 
 class AppHeader extends React.Component {
@@ -37,8 +41,14 @@ class AppHeader extends React.Component {
     return (
       <header className={classes.main}>
         <div className={classes.content}>
-          <MelloLogo />
-          <div className={classes.right}>LOG IN</div>
+          <Link to="/" className={classes.link}>
+            <MelloLogo />
+          </Link>
+          <div className={classes.right}>
+            <Link to="/auth" className={classes.link}>
+              LOG IN
+            </Link>
+          </div>
         </div>
       </header>
     );
