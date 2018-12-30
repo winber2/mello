@@ -29,7 +29,7 @@ func GetUsers(w http.ResponseWriter, r *http.Request) {
 func GetUser(w http.ResponseWriter, r *http.Request) {
 	var result models.User
 	vars := mux.Vars(r)
-	fmt.Println(vars["id"])
+
 	objectId := bson.ObjectIdHex(vars["id"])
 	err := mongo.Database.C("users").Find(bson.M{"_id": objectId}).One(&result)
 

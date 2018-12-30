@@ -1,6 +1,8 @@
 export const PRIMARY_BLUE = '#0d2748';
 export const SECONDARY_BLUE = '#066cc3';
 
+export const PRIMARY_RED = '#b9003c';
+
 export const OFF_WHITE = '#eee';
 export const OFF_BLACK = '#171717';
 

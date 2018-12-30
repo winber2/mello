@@ -5,6 +5,7 @@ import { OFF_WHITE, PRIMARY_GREY } from 'common/constants/colors';
 
 import Home from 'home/Home';
 import PrivateRoute from 'auth/PrivateRoute';
+import Authentication from 'auth/Authentication';
 import AppHeader from './header/AppHeader';
 
 const styles = {
@@ -38,13 +39,13 @@ class App extends React.Component {
               isAuthenticated
             />
             <Route
+              path={'/auth'}
+              component={Authentication}
+            />
+            <Route
               path={'/'}
               component={Home}
             />
-            {/* <Redirect
-              path={'/auth'}
-              component={Authentication}
-            /> */}
           </Switch>
         </div>
       </div>
