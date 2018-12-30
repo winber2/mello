@@ -91,7 +91,7 @@ func getPasswordHash(pw string) (string, error) {
 }
 
 // Save will try to save a User to the database if it is valid
-func (u *User) Save() error {
+func (u *User) Save() (interface{}, error) {
 	now := time.Now()
 	session := mongo.Database.Session.Copy()
 	c := mongo.Database.C(userCollection).With(session)
@@ -99,19 +99,23 @@ func (u *User) Save() error {
 
 	if err := u.Valid(); err != nil {
 		fmt.Println(err)
-		return err
+		return nil, err
 	}
 
 	password, _ := getPasswordHash(u.Password)
-	err := c.Insert(bson.M{
+	id := bson.NewObjectId()
+	user := bson.M{
+		"_id":      id,
 		"username": u.Username,
 		"email":    u.Email,
 		"password": password,
 		"created":  now,
 		"updated":  now,
-	})
+	}
 
-	return err
+	err := c.Insert(user)
+
+	return user, err
 }
 
 func (u *User) Valid() error {

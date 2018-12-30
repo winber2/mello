@@ -79,6 +79,7 @@ func main() {
 
 	// Reset the database with updated schema, we will probably need a better method later on
 	if resetDB {
+		fmt.Println("Resetting Database")
 		database.DropDatabase()
 		setupCollections()
 	}
