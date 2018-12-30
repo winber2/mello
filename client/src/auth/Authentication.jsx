@@ -36,6 +36,7 @@ class Authentication extends React.Component {
       <div className={classes.main}>
         <Formik
           initialValues={{
+            email: '',
             username: '',
             password: '',
           }}

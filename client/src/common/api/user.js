@@ -1,6 +1,6 @@
 import axios from 'axios';
-import { USERS, API } from 'common/constants/app';
+import { USER, API } from 'common/constants/app';
 
-export function postUser(params) {
-  return axios.post(`/${API}/${USERS}/`, params);
+export function postUser(user) {
+  return axios.post(`/${API}/${USER}/`, user);
 }

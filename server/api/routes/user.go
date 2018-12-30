@@ -45,8 +45,9 @@ func PostUser(w http.ResponseWriter, r *http.Request) {
 	var user models.User
 	json.NewDecoder(r.Body).Decode(&user)
 
-	fmt.Println(user)
 	err := user.Save()
+	s, _ := json.Marshal(err)
 
-	fmt.Println(err)
+	w.WriteHeader(http.StatusBadRequest)
+	w.Write(s)
 }
