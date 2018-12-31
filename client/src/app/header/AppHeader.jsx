@@ -45,7 +45,7 @@ class AppHeader extends React.Component {
             <MelloLogo />
           </Link>
           <div className={classes.right}>
-            <Link to="/auth" className={classes.link}>
+            <Link to="/auth?type=login" className={classes.link}>
               LOG IN
             </Link>
           </div>

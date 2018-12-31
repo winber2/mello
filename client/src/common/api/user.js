@@ -6,7 +6,9 @@ export function getUsers() {
 }
 
 export function postUser(user) {
-  return axios.post(`/${API}/${USER}/`, user).then(({ data }) => data);
+  return axios
+    .post(`/${API}/${USER}/`, user)
+    .then(({ data }) => getToken(data));
 }
 
 export function getToken(params) {
