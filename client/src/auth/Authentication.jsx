@@ -125,15 +125,14 @@ class Authentication extends React.Component {
                   {type === LOGIN ? 'Sign Up' : 'Log In'}
                 </div>
               </span>
-              <Button type="submit" disabled={getDisabledStatus(props.values)}>
-                {getLoginText(type)}
-              </Button>
+              <Button type="submit">{getLoginText(type)}</Button>
             </Form>
           )}
         </Formik>
-        {/* <Button onClick={() => getUsers().then(data => console.log(data))}>
+        this should only work if you are logged in
+        <Button onClick={() => getUsers().then(data => console.log(data))}>
           GET USERS
-        </Button> */}
+        </Button>
       </div>
     );
   }

@@ -26,10 +26,15 @@ func ContentTypeJSONMiddleware(next http.Handler) http.Handler {
 // JWTAuthentication is a middleware that prevents unauthorized access to the API
 func JWTAuthentication(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		// Temporary hack to allow posting for users
+		if r.URL.Path == "/user/" && r.Method == "POST" {
+			next.ServeHTTP(w, r)
+			return
+		}
+
 		tokenString := r.Header.Get("Authorization")
 		if tokenString == "" {
 			w.WriteHeader(http.StatusUnauthorized)
-			next.ServeHTTP(w, r)
 			return
 		}
 
