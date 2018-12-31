@@ -65,6 +65,12 @@ func parseFlags() {
 	flag.Parse()
 }
 
+func apiRouter() *mux.Router {
+	r := api.Router()
+	r.Use(JWTAuthentication)
+	return r
+}
+
 func main() {
 	parseFlags()
 
@@ -91,7 +97,8 @@ func main() {
 	router.PathPrefix("/public").Handler(http.StripPrefix("/public", http.FileServer(http.Dir(dir+clientDirectory))))
 
 	// Append api routes to server
-	router.PathPrefix("/api").Handler(http.StripPrefix("/api", api.Router()))
+	router.PathPrefix("/api").Handler(http.StripPrefix("/api", apiRouter()))
+	router.PathPrefix("/auth-token").HandlerFunc(GetAuthToken).Methods("GET")
 
 	// Catch all endpoint should redirect everything to the React Application
 	router.PathPrefix("/").HandlerFunc(func(w http.ResponseWriter, r *http.Request) {

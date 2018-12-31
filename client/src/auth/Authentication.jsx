@@ -4,7 +4,7 @@ import Button from 'common/components/base/Button';
 import Input from 'common/components/base/Input';
 import { Formik, Form } from 'formik';
 
-import { postUser } from 'common/api/user';
+import { postUser, getToken, getUsers } from 'common/api/user';
 
 const styles = {
   main: {
@@ -31,7 +31,10 @@ function getDisabledStatus({ email, username, password }) {
 class Authentication extends React.Component {
   onSubmit = (values, actions) => {
     console.log(values, actions);
-    postUser(values);
+    // postUser(values);
+    getToken(values).then(data => {
+      console.log(data);
+    });
   };
 
   render() {
@@ -78,6 +81,7 @@ class Authentication extends React.Component {
             </Form>
           )}
         </Formik>
+        <Button onClick={() => getUsers().then(data => console.log(data))}>GET USERS</Button>
       </div>
     );
   }

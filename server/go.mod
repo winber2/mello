@@ -1,6 +1,7 @@
 module mello/server
 
 require (
+	github.com/dgrijalva/jwt-go v3.2.0+incompatible
 	github.com/globalsign/mgo v0.0.0-20181015135952-eeefdecb41b8
 	github.com/gorilla/mux v1.6.2
 	github.com/gorilla/securecookie v1.1.1

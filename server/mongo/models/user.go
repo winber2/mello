@@ -90,6 +90,14 @@ func getPasswordHash(pw string) (string, error) {
 	return string(hash), err
 }
 
+// isSamePassword is a thin wrapper around the bcrypt method to compare passwords and hashes
+func isSamePassword(hash string, pw string) bool {
+	if err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(pw)); err != nil {
+		return false
+	}
+	return true
+}
+
 // Save will try to save a User to the database if it is valid
 func (u *User) Save() (interface{}, error) {
 	now := time.Now()
@@ -115,6 +123,8 @@ func (u *User) Save() (interface{}, error) {
 
 	err := c.Insert(user)
 
+	// Don't send the password back when creating a new account
+	delete(user, "password")
 	return user, err
 }
 
@@ -139,7 +149,19 @@ func (u *User) Valid() error {
 // FindUserByName is a function to help find users in the database
 func FindUserByName(name string) (*User, error) {
 	var result *User
-	err := mongo.Database.C(userCollection).Find(name).One(&result)
+	err := mongo.Database.C(userCollection).Find(bson.M{"username": name}).One(&result)
 
 	return result, err
+}
+
+// GetUserFromCredentials will check whether or not a valid password for the given user exists
+func GetUserFromCredentials(name string, pw string) (*User, error) {
+	user, err := FindUserByName(name)
+	if err != nil {
+		return &User{}, mongo.InvalidUserAndPassword
+	}
+	if isSamePassword(user.Password, pw) {
+		return user, nil
+	}
+	return &User{}, mongo.InvalidUserAndPassword
 }

@@ -3,6 +3,7 @@ package mongo
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"strings"
 )
 
@@ -11,9 +12,12 @@ const (
 	formError  = "FormError"
 )
 
-func toJSON(j interface{}) (string, error) {
+func ToJSON(j interface{}) []byte {
 	b, err := json.Marshal(j)
-	return string(b), err
+	if err != nil {
+		log.Print(err)
+	}
+	return b
 }
 
 // MelloError is a standardized error for any server side issues
@@ -31,11 +35,6 @@ func CreateError(message string) error {
 // Error converts the the error into a string -- implementing the error interface
 func (m *MelloError) Error() string {
 	return m.Message
-}
-
-// ToJSON is a convenience function to convert the Error into a JSON for API Responses
-func (m *MelloError) ToJSON() (string, error) {
-	return toJSON(m)
 }
 
 // FormError is a standardized error for bad form requests
@@ -71,7 +70,7 @@ func (f *FormError) Error() string {
 	return f.Message
 }
 
-// ToJSON is a convenience function to convert the Error into a JSON for API Responses
-func (f *FormError) ToJSON() (string, error) {
-	return toJSON(f)
-}
+// General errors constants
+var (
+	InvalidUserAndPassword = CreateError("Username or password is incorrect")
+)
